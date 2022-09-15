@@ -421,6 +421,7 @@ module aptos_framework::coin {
         );
 
         account::register_coin<CoinType>(account_addr);
+
         let coin_store = CoinStore<CoinType> {
             coin: Coin { value: 0 },
             frozen: false,

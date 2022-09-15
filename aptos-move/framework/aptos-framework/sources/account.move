@@ -445,12 +445,26 @@ module aptos_framework::account {
         guid::create(addr, &mut account.guid_creation_num)
     }
 
+    spec create_guid {
+        let addr = signer::address_of(account_signer);
+        let acc = global<Account>(addr);
+        aborts_if acc.guid_creation_num + 1 > MAX_U64;
+        aborts_if !exists<Account>(addr);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     /// GUID management methods.
     ///////////////////////////////////////////////////////////////////////////
 
     public fun new_event_handle<T: drop + store>(account: &signer): EventHandle<T> acquires Account {
         event::new_event_handle(create_guid(account))
+    }
+
+    spec new_event_handle {
+        let addr = signer::address_of(account);
+        let acc = global<Account>(addr);
+        aborts_if acc.guid_creation_num + 1 > MAX_U64;
+        aborts_if !exists<Account>(addr);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -465,6 +479,10 @@ module aptos_framework::account {
                 type_info: type_info::type_of<CoinType>(),
             },
         );
+    }
+
+    spec register_coin {
+        aborts_if !exists<Account>(account_addr);
     }
 
     ///////////////////////////////////////////////////////////////////////////
